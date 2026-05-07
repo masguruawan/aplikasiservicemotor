@@ -1,5 +1,5 @@
 // GANTI dengan URL Web App dari Google Apps Script Anda
-const SHEET_URL = "https://script.google.com/macros/s/AKfycbwIUBGYvExTS49LYtpzmSoXdL11phsCUrsizF7hxH5fL86CLlOBoXIk8K92fcJsi9Obuw/exec";
+const SHEET_URL = "https://script.google.com/macros/s/AKfycbyawqpUHJcUOUDZdfljlwf2w5KlMceP4QSeLCKxrx0qorDM9LMgiO6E4sNQiGmsV8jfJQ/exec";
 
 async function loadServiceData() {
     const container = document.getElementById('app-container');
