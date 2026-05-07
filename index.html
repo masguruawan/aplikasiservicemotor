@@ -4,12 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistem Bengkel Digital</title>
+    <!-- Library Eksternal -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <style>
-        .card-animate { animation: fadeIn 0.5s ease-out forwards; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body class="bg-slate-50 text-slate-900">
 
@@ -23,147 +21,39 @@
     </nav>
 
     <main class="max-w-4xl mx-auto p-4 md:p-8">
-        
+        <!-- FORM INPUT -->
         <section class="mb-10 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
             <h2 class="text-lg font-bold mb-5 flex items-center gap-2 text-blue-700">
                 <i data-lucide="plus-circle"></i> Catat Servis Baru
             </h2>
             <form id="service-form" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="flex flex-col gap-1">
-                    <label class="text-xs font-semibold text-slate-500 ml-1">Nama Pelanggan</label>
-                    <input type="text" id="nama" class="p-3 border rounded-xl bg-slate-50 focus:ring-2 focus:ring-blue-400 outline-none transition" placeholder="Contoh: Budi Santoso" required>
-                </div>
-                <div class="flex flex-col gap-1">
-                    <label class="text-xs font-semibold text-slate-500 ml-1">Jenis Motor</label>
-                    <input type="text" id="motor" class="p-3 border rounded-xl bg-slate-50 focus:ring-2 focus:ring-blue-400 outline-none transition" placeholder="Contoh: Vario 150" required>
-                </div>
-                <div class="flex flex-col gap-1">
-                    <label class="text-xs font-semibold text-slate-500 ml-1">Keluhan</label>
-                    <input type="text" id="keluhan" class="p-3 border rounded-xl bg-slate-50 focus:ring-2 focus:ring-blue-400 outline-none transition" placeholder="Apa masalahnya?" required>
-                </div>
-                <div class="flex flex-col gap-1">
-                    <label class="text-xs font-semibold text-slate-500 ml-1">Tindakan</label>
-                    <input type="text" id="tindakan" class="p-3 border rounded-xl bg-slate-50 focus:ring-2 focus:ring-blue-400 outline-none transition" placeholder="Apa yang diperbaiki?" required>
-                </div>
-                <div class="flex flex-col gap-1">
-                    <label class="text-xs font-semibold text-slate-500 ml-1">Total Biaya (Rp)</label>
-                    <input type="number" id="biaya" class="p-3 border rounded-xl bg-slate-50 focus:ring-2 focus:ring-blue-400 outline-none transition" placeholder="Contoh: 150000" required>
-                </div>
-                <div class="flex items-end">
-                    <button type="submit" id="btn-simpan" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition shadow-md flex items-center justify-center gap-2">
-                        <i data-lucide="save" class="w-5 h-5"></i> Simpan ke Spreadsheet
-                    </button>
-                </div>
+                <input type="text" id="nama" class="input-field" placeholder="Nama Pelanggan" required>
+                <input type="text" id="motor" class="input-field" placeholder="Jenis Motor" required>
+                <input type="text" id="keluhan" class="input-field" placeholder="Keluhan" required>
+                <input type="text" id="tindakan" class="input-field" placeholder="Tindakan" required>
+                <input type="number" id="biaya" class="input-field" placeholder="Total Biaya (Rp)" required>
+                <button type="submit" id="btn-simpan" class="btn-primary">
+                    <i data-lucide="save" class="w-5 h-5"></i> Simpan Data
+                </button>
             </form>
         </section>
 
-        <header class="flex justify-between items-center mb-6">
-            <h2 class="text-xl font-extrabold">Riwayat Servis Terakhir</h2>
-            <button onclick="location.reload()" class="text-slate-400 hover:text-blue-600 transition">
+        <!-- DAFTAR DATA -->
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-xl font-extrabold">Riwayat Servis</h2>
+            <button id="refresh-btn" class="text-slate-400 hover:text-blue-600 transition">
                 <i data-lucide="refresh-cw" class="w-5 h-5"></i>
             </button>
-        </header>
+        </div>
 
         <div id="loader" class="flex flex-col items-center py-20">
             <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600"></div>
-            <p class="mt-4 text-slate-400 animate-pulse">Mengambil data...</p>
         </div>
 
         <div id="app-container" class="grid gap-4 grid-cols-1 md:grid-cols-2"></div>
     </main>
 
-    <script>
-        // GANTI DENGAN URL APPS SCRIPT ANDA
-        const SHEET_URL = "URL_WEB_APP_ANDA_DI_SINI";
-
-        // Fungsi Ambil Data
-        async function loadData() {
-            const container = document.getElementById('app-container');
-            const loader = document.getElementById('loader');
-
-            try {
-                const response = await fetch(SHEET_URL);
-                const data = await response.json();
-                
-                loader.classList.add('hidden');
-                container.innerHTML = "";
-
-                // Tampilkan dari yang terbaru (reverse)
-                data.reverse().forEach((item, index) => {
-                    const biayaIdr = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(item.Biaya || 0);
-                    
-                    const card = `
-                        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition card-animate" style="animation-delay: ${index * 0.1}s">
-                            <div class="flex justify-between items-start mb-2">
-                                <h3 class="font-bold text-slate-800">${item['Nama Pelanggan']}</h3>
-                                <span class="text-[10px] bg-slate-100 text-slate-500 px-2 py-1 rounded font-bold uppercase">${item.Tanggal}</span>
-                            </div>
-                            <p class="text-xs font-bold text-blue-600 mb-4 bg-blue-50 inline-block px-2 py-1 rounded">${item['Jenis Motor']}</p>
-                            <div class="space-y-2 mb-4">
-                                <p class="text-sm text-slate-600 flex gap-2">
-                                    <i data-lucide="alert-circle" class="w-4 h-4 text-orange-400"></i>
-                                    <span><b>Keluhan:</b> ${item.Keluhan}</span>
-                                </p>
-                                <p class="text-sm text-slate-600 flex gap-2">
-                                    <i data-lucide="check-circle" class="w-4 h-4 text-green-400"></i>
-                                    <span><b>Tindakan:</b> ${item.Tindakan}</span>
-                                </p>
-                            </div>
-                            <div class="pt-3 border-t border-slate-100 flex justify-between items-center">
-                                <span class="text-[10px] text-slate-400 font-bold uppercase">Total Biaya</span>
-                                <span class="font-black text-blue-700 text-lg">${biayaIdr}</span>
-                            </div>
-                        </div>
-                    `;
-                    container.innerHTML += card;
-                });
-                lucide.createIcons();
-            } catch (error) {
-                loader.innerHTML = `<p class="text-red-500 text-sm">Gagal memuat data. Periksa URL API.</p>`;
-            }
-        }
-
-        // Fungsi Simpan Data
-        document.getElementById('service-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const btn = document.getElementById('btn-simpan');
-            btn.disabled = true;
-            btn.innerHTML = "Proses Menyimpan...";
-
-            const payload = {
-                nama: document.getElementById('nama').value,
-                motor: document.getElementById('motor').value,
-                keluhan: document.getElementById('keluhan').value,
-                tindakan: document.getElementById('tindakan').value,
-                biaya: document.getElementById('biaya').value,
-                tanggal: new Date().toLocaleDateString('id-ID')
-            };
-
-            try {
-                // Gunakan mode: 'no-cors' untuk Apps Script
-                await fetch(SHEET_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    body: JSON.stringify(payload)
-                });
-                
-                alert("Berhasil! Data telah dikirim ke Spreadsheet.");
-                document.getElementById('service-form').reset();
-                loadData(); // Refresh daftar
-            } catch (error) {
-                alert("Error saat menyimpan data.");
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = `<i data-lucide="save" class="w-5 h-5"></i> Simpan ke Spreadsheet`;
-                lucide.createIcons();
-            }
-        });
-
-        // Jalankan saat startup
-        window.onload = () => {
-            loadData();
-            lucide.createIcons();
-        };
-    </script>
+    <!-- Hubungkan ke file JS -->
+    <script src="script.js"></script>
 </body>
 </html>
